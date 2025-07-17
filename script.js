@@ -57,9 +57,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const valsString = match[3];
 
         const parsedColumns = colsString.split(',').map(c => c.trim().replace(/[`\"\\]/g, ''));
-        
+
         // Regex to split values by comma, but ignoring commas inside single quotes.
-        const parsedValues = valsString.match(/('[^']*'|[^,]+)/g).map(v => v.trim());
+        const parsedValues = valsString.match(/('[^']*'|[^,]+)/g).map(v => {
+            let value = v.trim();
+            // Strip leading and trailing quotes
+            if (value.startsWith("'") && value.endsWith("'")) {
+                value = value.substring(1, value.length - 1);
+            }
+            return value;
+        });
 
         if (parsedColumns.length !== parsedValues.length) {
             console.error("Columns:", parsedColumns);
@@ -125,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const val = inputs[1].value.trim();
 
             if (col) { // Only include if column name is not empty
-                generatedColumns.push(`\`${col}\``);
+                generatedColumns.push(col);
                 generatedValues.push(formatValue(val));
             }
         });
