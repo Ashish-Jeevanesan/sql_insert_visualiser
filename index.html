@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Insert Script Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SQL Insert Script Editor</h1>
+            <div class="theme-switcher">
+                <i class="fas fa-sun"></i>
+                <label class="switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider round"></span>
+                </label>
+                <i class="fas fa-moon"></i>
+            </div>
+        </header>
+
+        <main class="main-grid">
+            <div class="grid-left">
+                <div class="input-section">
+                    <label for="sqlInput">Paste your SQL INSERT script:</label>
+                    <textarea id="sqlInput" placeholder="e.g., INSERT INTO users (id, name, email) VALUES (1, 'John Doe', 'john.doe@example.com');"></textarea>
+                    <div class="button-group">
+                        <button id="parse" class="btn btn-primary">Parse</button>
+                        <button id="clear" class="btn btn-secondary">Clear</button>
+                    </div>
+                </div>
+
+                <div id="outputSection" class="hidden">
+                    <div class="output-header">
+                        <h3>Generated SQL</h3>
+                        <button id="copy" class="btn btn-secondary"><i class="fas fa-copy"></i> Copy</button>
+                    </div>
+                    <div class="output-container">
+                        <pre id="outputSQL"></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div id="editorSection" class="grid-right hidden">
+                <h3>Editable Field List</h3>
+                <div class="table-container">
+                    <form id="tableForm">
+                        <table id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Value</th>
+                                    <th class="actions"></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </form>
+                </div>
+                <div class="button-group">
+                    <button id="addRow" class="btn btn-secondary"><i class="fas fa-plus"></i> Add Row</button>
+                    <button id="generate" class="btn btn-primary">Generate SQL</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Your Name / Your Company. All Rights Reserved.</p>
+            <p>Designed & Developed by <a href="#">Your Name</a></p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
