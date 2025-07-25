@@ -26,6 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const copyCommaBtn = document.getElementById('copyComma');
     const copyQuotedBtn = document.getElementById('copyQuoted');
 
+    // --- Line Remover Elements ---
+    const lineInput = document.getElementById('lineInput');
+    const removeLinesBtn = document.getElementById('removeLines');
+    const clearLinesBtn = document.getElementById('clearLines');
+    const lineOutputSection = document.getElementById('lineOutputSection');
+    const lineOutput = document.getElementById('lineOutput');
+    const copyLinesBtn = document.getElementById('copyLines');
+
     let tableName = '';
     let columns = [];
 
@@ -182,6 +190,33 @@ document.addEventListener('DOMContentLoaded', () => {
         clearColumnBtn.addEventListener('click', clearColumnParser);
         copyCommaBtn.addEventListener('click', () => copyToClipboard(commaOutput, copyCommaBtn));
         copyQuotedBtn.addEventListener('click', () => copyToClipboard(quotedOutput, copyQuotedBtn));
+    }
+
+    // --- Line Remover Logic ---
+    if (removeLinesBtn) {
+        removeLinesBtn.addEventListener('click', removeLineNumbers);
+        clearLinesBtn.addEventListener('click', clearLineRemover);
+        copyLinesBtn.addEventListener('click', () => copyToClipboard(lineOutput, copyLinesBtn));
+    }
+
+    function removeLineNumbers() {
+        const input = lineInput.value;
+        if (!input) {
+            alert('Please paste some code.');
+            return;
+        }
+
+        // Use a global and multiline regex to remove numbers from the start of each line.
+        const formattedCode = input.replace(/^\s*\d+\s*/gm, '');
+
+        lineOutput.textContent = formattedCode;
+        lineOutputSection.classList.remove('hidden');
+    }
+
+    function clearLineRemover() {
+        lineInput.value = '';
+        lineOutput.textContent = '';
+        lineOutputSection.classList.add('hidden');
     }
 
     function parseColumnData() {

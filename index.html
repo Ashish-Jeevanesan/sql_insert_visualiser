@@ -24,6 +24,7 @@
         <div class="tabs">
             <button class="tab-link active" data-tab="tab-sql-editor"><i class="fas fa-edit"></i> SQL Insert Editor</button>
             <button class="tab-link" data-tab="tab-column-parser"><i class="fas fa-columns"></i> Column Parser</button>
+            <button class="tab-link" data-tab="tab-line-remover"><i class="fas fa-list-ol"></i> Line Remover</button>
         </div>
 
         <main id="tab-sql-editor" class="tab-content active">
@@ -99,6 +100,28 @@
                         </div>
                         <pre id="quotedOutput"></pre>
                     </div>
+                </div>
+            </div>
+        </main>
+
+        <main id="tab-line-remover" class="tab-content hidden">
+            <div class="input-section">
+                <label for="lineInput">Paste your code with line numbers:</label>
+                <textarea id="lineInput" placeholder="1 SELECT ...
+2 FROM ..."></textarea>
+                <div class="button-group">
+                    <button id="removeLines" class="btn btn-primary">Remove Line Numbers</button>
+                    <button id="clearLines" class="btn btn-secondary">Clear</button>
+                </div>
+            </div>
+
+            <div id="lineOutputSection" class="hidden">
+                <div class="output-header">
+                    <h3>Formatted Code</h3>
+                    <button id="copyLines" class="btn btn-secondary"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+                <div class="output-container">
+                    <pre id="lineOutput"></pre>
                 </div>
             </div>
         </main>
