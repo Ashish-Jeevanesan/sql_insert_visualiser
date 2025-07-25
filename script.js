@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- General Elements ---
+    const themeToggle = document.getElementById('theme-toggle');
+    const tabs = document.querySelectorAll('.tab-link');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    // --- SQL Insert Editor Elements ---
     const sqlInput = document.getElementById('sqlInput');
     const parseBtn = document.getElementById('parse');
     const clearBtn = document.getElementById('clear');
@@ -9,22 +15,56 @@ document.addEventListener('DOMContentLoaded', () => {
     const generateBtn = document.getElementById('generate');
     const outputSQL = document.getElementById('outputSQL');
     const copyBtn = document.getElementById('copy');
-    const themeToggle = document.getElementById('theme-toggle');
+
+    // --- Column Parser Elements ---
+    const columnInput = document.getElementById('columnInput');
+    const parseColumnBtn = document.getElementById('parseColumn');
+    const clearColumnBtn = document.getElementById('clearColumn');
+    const columnOutputSection = document.getElementById('columnOutputSection');
+    const commaOutput = document.getElementById('commaOutput');
+    const quotedOutput = document.getElementById('quotedOutput');
+    const copyCommaBtn = document.getElementById('copyComma');
+    const copyQuotedBtn = document.getElementById('copyQuoted');
 
     let tableName = '';
     let columns = [];
 
     // --- Theme Switcher ---
+    // Set initial theme based on body attribute
+    if (document.body.dataset.theme === 'dark') {
+        themeToggle.checked = true;
+    }
+
     themeToggle.addEventListener('change', () => {
         document.body.dataset.theme = themeToggle.checked ? 'dark' : 'light';
     });
 
-    // --- Event Listeners ---
-    parseBtn.addEventListener('click', parseInsert);
-    clearBtn.addEventListener('click', clearAll);
-    addRowBtn.addEventListener('click', () => addRow('', ''));
-    generateBtn.addEventListener('click', generateInsert);
-    copyBtn.addEventListener('click', copyToClipboard);
+    // --- Tab Functionality ---
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                content.classList.add('hidden');
+            });
+
+            const tabId = tab.dataset.tab;
+            const activeTab = document.getElementById(tabId);
+            activeTab.classList.add('active');
+            activeTab.classList.remove('hidden');
+        });
+    });
+
+    // --- SQL Insert Editor Logic ---
+    if (parseBtn) {
+        parseBtn.addEventListener('click', parseInsert);
+        clearBtn.addEventListener('click', clearAll);
+        addRowBtn.addEventListener('click', () => addRow('', ''));
+        generateBtn.addEventListener('click', generateInsert);
+        copyBtn.addEventListener('click', () => copyToClipboard(outputSQL, copyBtn));
+    }
 
     function clearAll() {
         sqlInput.value = '';
@@ -43,8 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // A single, more robust regex to capture table, columns, and values
-        const sqlRegex = /insert\s+into\s+([`\"\\]?\w+[`\"\\]?)\s*\(([\s\S]+?)\)\s*values\s*\(([\s\S]+?)\)\s*;?/i;
+        const sqlRegex = /insert\s+into\s+([`"\\]?\w+[`"\\]?)\s*\(([\s\S]+?)\)\s*values\s*\(([\s\S]+?)\)\s*;?/i;
         const match = input.match(sqlRegex);
 
         if (!match) {
@@ -52,16 +91,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        tableName = match[1].replace(/[`\"\\]/g, '');
+        tableName = match[1].replace(/[`"\\]/g, '');
         const colsString = match[2];
         const valsString = match[3];
 
-        const parsedColumns = colsString.split(',').map(c => c.trim().replace(/[`\"\\]/g, ''));
-
-        // Regex to split values by comma, but ignoring commas inside single quotes.
+        const parsedColumns = colsString.split(',').map(c => c.trim().replace(/[`"\\]/g, ''));
         const parsedValues = valsString.match(/('[^']*'|[^,]+)/g).map(v => {
             let value = v.trim();
-            // Strip leading and trailing quotes
             if (value.startsWith("'") && value.endsWith("'")) {
                 value = value.substring(1, value.length - 1);
             }
@@ -69,8 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (parsedColumns.length !== parsedValues.length) {
-            console.error("Columns:", parsedColumns);
-            console.error("Values:", parsedValues);
             alert(`Number of columns (${parsedColumns.length}) and values (${parsedValues.length}) do not match.`);
             return;
         }
@@ -87,32 +121,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function addRow(columnName, value) {
         const row = document.createElement('tr');
-
-        const colCell = document.createElement('td');
-        const colInput = document.createElement('input');
-        colInput.type = 'text';
-        colInput.value = columnName;
-        colInput.placeholder = 'Column Name';
-        colCell.appendChild(colInput);
-
-        const valCell = document.createElement('td');
-        const valInput = document.createElement('input');
-        valInput.type = 'text';
-        valInput.value = value;
-        valInput.placeholder = 'Value';
-        valCell.appendChild(valInput);
-
-        const actionsCell = document.createElement('td');
-        actionsCell.classList.add('actions');
-        const removeBtn = document.createElement('button');
-        removeBtn.innerHTML = '<i class="fas fa-trash"></i>';
-        removeBtn.classList.add('btn', 'btn-danger');
-        removeBtn.addEventListener('click', () => row.remove());
-        actionsCell.appendChild(removeBtn);
-
-        row.appendChild(colCell);
-        row.appendChild(valCell);
-        row.appendChild(actionsCell);
+        row.innerHTML = `
+            <td><input type="text" value="${columnName}" placeholder="Column Name"></td>
+            <td><input type="text" value="${value}" placeholder="Value"></td>
+            <td class="actions">
+                <button class="btn btn-danger"><i class="fas fa-trash"></i></button>
+            </td>
+        `;
+        row.querySelector('.btn-danger').addEventListener('click', () => row.remove());
         dataTableBody.appendChild(row);
     }
 
@@ -131,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const col = inputs[0].value.trim();
             const val = inputs[1].value.trim();
 
-            if (col) { // Only include if column name is not empty
+            if (col) {
                 generatedColumns.push(col);
                 generatedValues.push(formatValue(val));
             }
@@ -155,19 +171,52 @@ document.addEventListener('DOMContentLoaded', () => {
             return v;
         }
         if (!isNaN(v) && v.trim() !== '') {
-            return v; // It's a number
+            return v;
         }
-        // It's a string, so quote it, escaping single quotes inside
         return `'${v.replace(/'/g, "''")}'`;
     }
 
-    function copyToClipboard() {
-        if (!outputSQL.textContent) return;
-        navigator.clipboard.writeText(outputSQL.textContent).then(() => {
-            const originalText = copyBtn.innerHTML;
-            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    // --- Column Parser Logic ---
+    if (parseColumnBtn) {
+        parseColumnBtn.addEventListener('click', parseColumnData);
+        clearColumnBtn.addEventListener('click', clearColumnParser);
+        copyCommaBtn.addEventListener('click', () => copyToClipboard(commaOutput, copyCommaBtn));
+        copyQuotedBtn.addEventListener('click', () => copyToClipboard(quotedOutput, copyQuotedBtn));
+    }
+
+    function parseColumnData() {
+        const input = columnInput.value.trim();
+        if (!input) {
+            alert('Please paste some column data.');
+            return;
+        }
+
+        const lines = input.split(/\r?\n/).filter(line => line.trim() !== '');
+        
+        const commaSeparated = lines.join(',');
+        const quotedCommaSeparated = lines.map(line => `'${line.replace(/'/g, "''")}'`).join(',');
+
+        commaOutput.textContent = commaSeparated;
+        quotedOutput.textContent = quotedCommaSeparated;
+
+        columnOutputSection.classList.remove('hidden');
+    }
+
+    function clearColumnParser() {
+        columnInput.value = '';
+        commaOutput.textContent = '';
+        quotedOutput.textContent = '';
+        columnOutputSection.classList.add('hidden');
+    }
+
+    // --- Generic Helper Functions ---
+    function copyToClipboard(element, button) {
+        if (!element.textContent) return;
+        navigator.clipboard.writeText(element.textContent).then(() => {
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check"></i> Copied!';
             setTimeout(() => {
-                copyBtn.innerHTML = originalText;
+                button.innerHTML = originalText;
             }, 2000);
         }).catch(err => {
             alert('Failed to copy text.');

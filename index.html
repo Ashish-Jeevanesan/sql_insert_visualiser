@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL Insert Script Editor</title>
+    <title>DataWand - SQL & Data Tools</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-theme="dark">
     <div class="container">
         <header>
-            <h1>SQL Insert Script Editor</h1>
+            <h1><i class="fas fa-magic-wand-sparkles"></i> DataWand</h1>
             <div class="theme-switcher">
                 <i class="fas fa-sun"></i>
                 <label class="switch">
@@ -21,47 +21,84 @@
             </div>
         </header>
 
-        <main class="main-grid">
-            <div class="grid-left">
-                <div class="input-section">
-                    <label for="sqlInput">Paste your SQL INSERT script:</label>
-                    <textarea id="sqlInput" placeholder="e.g., INSERT INTO users (id, name, email) VALUES (1, 'John Doe', 'john.doe@example.com');"></textarea>
-                    <div class="button-group">
-                        <button id="parse" class="btn btn-primary">Parse</button>
-                        <button id="clear" class="btn btn-secondary">Clear</button>
+        <div class="tabs">
+            <button class="tab-link active" data-tab="tab-sql-editor"><i class="fas fa-edit"></i> SQL Insert Editor</button>
+            <button class="tab-link" data-tab="tab-column-parser"><i class="fas fa-columns"></i> Column Parser</button>
+        </div>
+
+        <main id="tab-sql-editor" class="tab-content active">
+            <div class="main-grid">
+                <div class="grid-left">
+                    <div class="input-section">
+                        <label for="sqlInput">Paste your SQL INSERT script:</label>
+                        <textarea id="sqlInput" placeholder="e.g., INSERT INTO users (id, name, email) VALUES (1, 'John Doe', 'john.doe@example.com');"></textarea>
+                        <div class="button-group">
+                            <button id="parse" class="btn btn-primary">Parse</button>
+                            <button id="clear" class="btn btn-secondary">Clear</button>
+                        </div>
+                    </div>
+
+                    <div id="outputSection" class="hidden">
+                        <div class="output-header">
+                            <h3>Generated SQL</h3>
+                            <button id="copy" class="btn btn-secondary"><i class="fas fa-copy"></i> Copy</button>
+                        </div>
+                        <div class="output-container">
+                            <pre id="outputSQL"></pre>
+                        </div>
                     </div>
                 </div>
 
-                <div id="outputSection" class="hidden">
-                    <div class="output-header">
-                        <h3>Generated SQL</h3>
-                        <button id="copy" class="btn btn-secondary"><i class="fas fa-copy"></i> Copy</button>
+                <div id="editorSection" class="grid-right hidden">
+                    <h3>Editable Field List</h3>
+                    <div class="table-container">
+                        <form id="tableForm">
+                            <table id="dataTable">
+                                <thead>
+                                    <tr>
+                                        <th>Column</th>
+                                        <th>Value</th>
+                                        <th class="actions"></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </form>
                     </div>
-                    <div class="output-container">
-                        <pre id="outputSQL"></pre>
+                    <div class="button-group">
+                        <button id="addRow" class="btn btn-secondary"><i class="fas fa-plus"></i> Add Row</button>
+                        <button id="generate" class="btn btn-primary">Generate SQL</button>
                     </div>
                 </div>
             </div>
+        </main>
 
-            <div id="editorSection" class="grid-right hidden">
-                <h3>Editable Field List</h3>
-                <div class="table-container">
-                    <form id="tableForm">
-                        <table id="dataTable">
-                            <thead>
-                                <tr>
-                                    <th>Column</th>
-                                    <th>Value</th>
-                                    <th class="actions"></th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </form>
-                </div>
+        <main id="tab-column-parser" class="tab-content hidden">
+            <div class="input-section">
+                <label for="columnInput">Paste your column data (from Excel, SQL query, etc.):</label>
+                <textarea id="columnInput" placeholder="Paste one column of data here, with each value on a new line."></textarea>
                 <div class="button-group">
-                    <button id="addRow" class="btn btn-secondary"><i class="fas fa-plus"></i> Add Row</button>
-                    <button id="generate" class="btn btn-primary">Generate SQL</button>
+                    <button id="parseColumn" class="btn btn-primary">Parse Column Data</button>
+                    <button id="clearColumn" class="btn btn-secondary">Clear</button>
+                </div>
+            </div>
+
+            <div id="columnOutputSection" class="hidden">
+                <div class="output-grid">
+                    <div class="output-box">
+                        <div class="output-header">
+                            <h3>Comma Separated</h3>
+                            <button id="copyComma" class="btn btn-secondary btn-sm"><i class="fas fa-copy"></i> Copy</button>
+                        </div>
+                        <pre id="commaOutput"></pre>
+                    </div>
+                    <div class="output-box">
+                        <div class="output-header">
+                            <h3>Comma Separated with Quotes</h3>
+                            <button id="copyQuoted" class="btn btn-secondary btn-sm"><i class="fas fa-copy"></i> Copy</button>
+                        </div>
+                        <pre id="quotedOutput"></pre>
+                    </div>
                 </div>
             </div>
         </main>
