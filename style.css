@@ -147,6 +147,18 @@ input:checked + .slider:before {
     display: block;
 }
 
+.tool-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.tool-title {
+    margin: 0;
+    font-size: 1.4em;
+    color: var(--primary-color);
+}
+
 .main-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -184,6 +196,16 @@ textarea {
     border-radius: 4px;
     font-size: 1em;
     box-sizing: border-box;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+input[type="text"], select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
     background-color: var(--background-color);
     color: var(--text-color);
 }
@@ -239,16 +261,6 @@ th, td {
 th {
     background-color: var(--table-header-bg);
     font-weight: bold;
-}
-
-input[type="text"] {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background-color: var(--background-color);
-    color: var(--text-color);
 }
 
 .actions {
@@ -319,6 +331,80 @@ footer a {
 
 footer a:hover {
     text-decoration: underline;
+}
+
+/* HashMap Parser */
+.drop-zone {
+    border: 2px dashed var(--border-color);
+    padding: 14px;
+    text-align: center;
+    border-radius: 6px;
+    font-size: 0.95em;
+    background: var(--background-color);
+}
+
+.drop-zone.dragover {
+    border-color: var(--primary-color);
+    background: rgba(147, 112, 219, 0.08);
+}
+
+.hashmap-output .section {
+    margin-top: 20px;
+}
+
+.hashmap-output .section h3 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+}
+
+.hashmap-output table {
+    margin-top: 10px;
+}
+
+.hashmap-output tr.highlight th {
+    background: rgba(147, 112, 219, 0.15);
+}
+
+.hashmap-output td.value {
+    cursor: pointer;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.hashmap-output td.value:hover {
+    background: rgba(147, 112, 219, 0.12);
+}
+
+/* Barcode Generator */
+.barcode-toolbar {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.input-group {
+    flex: 1 1 240px;
+}
+
+.barcode-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.barcode-item {
+    text-align: center;
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 12px;
+}
+
+.barcode-item svg,
+.barcode-item canvas {
+    max-width: 100%;
 }
 
 

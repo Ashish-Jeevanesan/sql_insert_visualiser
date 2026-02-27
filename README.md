@@ -21,6 +21,18 @@ A sleek and intuitive web-based toolkit for developers. DataWand provides a set 
 -   **Clean Up Code:** Paste code or text that has line numbers, and the tool will instantly remove them.
 -   **Multi-line Support:** Works with code snippets of any length.
 
+### 4. HashMap Log Viewer
+-   **Parse Logs:** Paste a HashMap log and parse it into a grouped, readable table.
+-   **Key Search:** Filter keys instantly with a search box.
+-   **Copy on Click:** Click any value to copy it.
+-   **CSV Export:** Export parsed data to CSV for quick analysis.
+-   **Drag & Drop:** Drop a `.txt` log file to auto-parse.
+
+### 5. Bulk Barcode & QR Generator
+-   **Multiple Formats:** Generate GS1-128, CODE128, or QR codes.
+-   **Batch Generation:** Paste one value per line and generate all at once.
+-   **Download All:** Export all generated images as a zip file.
+
 ### General
 -   **Copy to Clipboard:** Instantly copy any generated output with a single click.
 -   **Dark/Light Mode:** Switch between a comfortable dark theme and a clean light theme.
@@ -28,7 +40,7 @@ A sleek and intuitive web-based toolkit for developers. DataWand provides a set 
 
 ## 🚀 How to Use
 
-1.  **Select a Tool:** Use the tabs at the top to switch between the **SQL Insert Editor**, **Column Parser**, and **Line Remover**.
+1.  **Select a Tool:** Use the tabs at the top to switch between **SQL Insert Editor**, **Column Parser**, **Line Remover**, **HashMap Log Viewer**, and **Barcode Generator**.
 2.  **Input Data:** Paste your data into the appropriate input area.
 3.  **Parse & Edit:** Use the available buttons to parse, edit, and generate your desired output.
 4.  **Copy:** Click the **<i class="fas fa-copy"></i> Copy** button to copy the results to your clipboard.

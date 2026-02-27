@@ -25,6 +25,8 @@
             <button class="tab-link active" data-tab="tab-sql-editor"><i class="fas fa-edit"></i> SQL Insert Editor</button>
             <button class="tab-link" data-tab="tab-column-parser"><i class="fas fa-columns"></i> Column Parser</button>
             <button class="tab-link" data-tab="tab-line-remover"><i class="fas fa-list-ol"></i> Line Number Remover</button>
+            <button class="tab-link" data-tab="tab-hashmap-parser"><i class="fas fa-table"></i> HashMap Parser</button>
+            <button class="tab-link" data-tab="tab-barcode-gen"><i class="fas fa-barcode"></i> Barcode Generator</button>
         </div>
 
         <main id="tab-sql-editor" class="tab-content active">
@@ -126,11 +128,70 @@
             </div>
         </main>
 
+        <main id="tab-hashmap-parser" class="tab-content hidden">
+            <section class="tool-section">
+                <h2 class="tool-title">HashMap Log Viewer</h2>
+
+                <div class="button-group">
+                    <button id="hashmap-parse" class="btn btn-primary">Parse</button>
+                    <button id="hashmap-export" class="btn btn-secondary">Export CSV</button>
+                    <button id="hashmap-toggle-theme" class="btn btn-secondary">Toggle Dark Mode</button>
+                </div>
+
+                <div class="input-section">
+                    <label for="hashmap-search">Search key:</label>
+                    <input id="hashmap-search" type="text" placeholder="Search key..." />
+                </div>
+
+                <div class="input-section">
+                    <label for="hashmap-input">Paste HashMap log here:</label>
+                    <textarea id="hashmap-input" placeholder="Paste HashMap log here..."></textarea>
+                    <div id="hashmap-drop-zone" class="drop-zone">
+                        Drag &amp; drop a .txt log file here
+                    </div>
+                </div>
+
+                <div id="hashmap-output" class="hashmap-output"></div>
+            </section>
+        </main>
+
+        <main id="tab-barcode-gen" class="tab-content hidden">
+            <section class="tool-section">
+                <h2 class="tool-title">Bulk Barcode &amp; QR Generator</h2>
+
+                <div class="barcode-toolbar">
+                    <div class="input-group">
+                        <label for="barcode-type">Type:</label>
+                        <select id="barcode-type">
+                            <option value="gs1">GS1-128 Barcode</option>
+                            <option value="barcode">Normal CODE128</option>
+                            <option value="qr">QR Code</option>
+                        </select>
+                    </div>
+                    <div class="button-group">
+                        <button id="barcode-generate" class="btn btn-primary">Generate</button>
+                        <button id="barcode-download" class="btn btn-secondary">Download All</button>
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <label for="barcode-data">Values (one per line):</label>
+                    <textarea id="barcode-data" placeholder="One value per line"></textarea>
+                </div>
+
+                <div id="barcode-output" class="barcode-grid"></div>
+            </section>
+        </main>
+
         <footer>
             <p>&copy; 2025 Ashish Jeevanesan / AJ. All Rights Reserved.</p>
             <p>Designed & Developed by <a href="https://github.com/Ashish-Jeevanesan">Ashish Jeevanesan</a></p>
         </footer>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

@@ -34,6 +34,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const lineOutput = document.getElementById('lineOutput');
     const copyLinesBtn = document.getElementById('copyLines');
 
+    // --- HashMap Parser Elements ---
+    const hashmapParseBtn = document.getElementById('hashmap-parse');
+    const hashmapExportBtn = document.getElementById('hashmap-export');
+    const hashmapToggleThemeBtn = document.getElementById('hashmap-toggle-theme');
+    const hashmapSearch = document.getElementById('hashmap-search');
+    const hashmapInput = document.getElementById('hashmap-input');
+    const hashmapDropZone = document.getElementById('hashmap-drop-zone');
+    const hashmapOutput = document.getElementById('hashmap-output');
+
+    // --- Barcode Generator Elements ---
+    const barcodeType = document.getElementById('barcode-type');
+    const barcodeData = document.getElementById('barcode-data');
+    const barcodeGenerateBtn = document.getElementById('barcode-generate');
+    const barcodeDownloadBtn = document.getElementById('barcode-download');
+    const barcodeOutput = document.getElementById('barcode-output');
+
     let tableName = '';
     let columns = [];
 
@@ -256,5 +272,197 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(err => {
             alert('Failed to copy text.');
         });
+    }
+
+    // --- HashMap Parser Logic ---
+    const IMPORTANT_KEYS = ["INV", "ACCID", "INV_AMT", "INVDT", "PAYNM", "CURRENCY"];
+    const GROUPS = {
+        "Billing": ["BILL", "ACC", "PAY", "VAT", "CURRENCY"],
+        "Shipping": ["SHIP", "PLANT", "DELIVERY"],
+        "Finance": ["INV", "AMT", "TAX", "DIST", "COMP"],
+        "General": []
+    };
+    let hashmapParsedData = [];
+
+    if (hashmapParseBtn) {
+        hashmapParseBtn.addEventListener('click', parseHashmap);
+        hashmapExportBtn.addEventListener('click', exportHashmapCSV);
+        hashmapSearch.addEventListener('input', filterHashmapKeys);
+        hashmapToggleThemeBtn.addEventListener('click', () => {
+            themeToggle.checked = !themeToggle.checked;
+            document.body.dataset.theme = themeToggle.checked ? 'dark' : 'light';
+        });
+    }
+
+    function parseHashmap() {
+        const raw = hashmapInput.value.trim();
+        if (!raw) return;
+
+        hashmapParsedData = [];
+        const clean = raw.replace(/^{|}$/g, '');
+        const pairs = clean.split(/,\s*(?=[A-Z0-9_]+=)/);
+
+        pairs.forEach(p => {
+            const i = p.indexOf('=');
+            if (i === -1) return;
+            hashmapParsedData.push({
+                key: p.substring(0, i).trim(),
+                value: p.substring(i + 1).trim()
+            });
+        });
+
+        renderHashmap(hashmapParsedData);
+    }
+
+    function renderHashmap(data) {
+        hashmapOutput.innerHTML = '';
+
+        for (const [group, keywords] of Object.entries(GROUPS)) {
+            const groupItems = data.filter(d =>
+                keywords.length === 0
+                    ? !Object.values(GROUPS).flat().some(k => d.key.includes(k))
+                    : keywords.some(k => d.key.includes(k))
+            );
+
+            if (!groupItems.length) continue;
+
+            const section = document.createElement('div');
+            section.className = 'section';
+            section.innerHTML = `<h3>${group}</h3>`;
+
+            let table = '<table><tr><th>Key</th><th>Value</th></tr>';
+            groupItems.forEach(({ key, value }) => {
+                const highlight = IMPORTANT_KEYS.includes(key) ? 'highlight' : '';
+                const val = value.includes('<div>') || value.includes('<br>')
+                    ? value
+                    : escapeHtml(value);
+
+                table += `
+                    <tr class="${highlight}">
+                        <th>${key}</th>
+                        <td class="value" data-copy="${escapeHtml(value)}">${val}</td>
+                    </tr>`;
+            });
+
+            table += '</table>';
+            section.innerHTML += table;
+            hashmapOutput.appendChild(section);
+        }
+
+        hashmapOutput.querySelectorAll('td.value').forEach(cell => {
+            cell.addEventListener('click', () => copyHashmapValue(cell));
+        });
+    }
+
+    function filterHashmapKeys() {
+        const q = hashmapSearch.value.toLowerCase();
+        renderHashmap(hashmapParsedData.filter(d => d.key.toLowerCase().includes(q)));
+    }
+
+    function copyHashmapValue(cell) {
+        const text = cell.getAttribute('data-copy') || cell.innerText;
+        navigator.clipboard.writeText(text);
+        cell.style.background = 'rgba(34, 197, 94, 0.2)';
+        setTimeout(() => cell.style.background = '', 500);
+    }
+
+    function exportHashmapCSV() {
+        if (!hashmapParsedData.length) return;
+        let csv = 'Key,Value\n';
+        hashmapParsedData.forEach(d => {
+            csv += `"${d.key}","${d.value.replace(/"/g, '""')}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'hashmap_log.csv';
+        a.click();
+    }
+
+    function escapeHtml(text) {
+        return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    if (hashmapDropZone) {
+        hashmapDropZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            hashmapDropZone.classList.add('dragover');
+        });
+        hashmapDropZone.addEventListener('dragleave', () => hashmapDropZone.classList.remove('dragover'));
+        hashmapDropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            hashmapDropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                hashmapInput.value = ev.target.result;
+                parseHashmap();
+            };
+            reader.readAsText(file);
+        });
+    }
+
+    // --- Barcode Generator Logic ---
+    let barcodeImages = [];
+
+    if (barcodeGenerateBtn) {
+        barcodeGenerateBtn.addEventListener('click', generateBarcodes);
+        barcodeDownloadBtn.addEventListener('click', downloadAllBarcodes);
+    }
+
+    function generateBarcodes() {
+        barcodeImages = [];
+        barcodeOutput.innerHTML = '';
+
+        const values = barcodeData.value
+            .split('\n')
+            .map(v => v.trim())
+            .filter(v => v);
+
+        const type = barcodeType.value;
+
+        values.forEach((text, i) => {
+            const div = document.createElement('div');
+            div.className = 'barcode-item';
+
+            if (type === 'barcode' || type === 'gs1') {
+                const svg = document.createElement('svg');
+                JsBarcode(svg, text, {
+                    format: 'CODE128',
+                    gs1: type === 'gs1',
+                    width: 2,
+                    height: 90,
+                    displayValue: true
+                });
+                div.appendChild(svg);
+                barcodeImages.push(svg);
+            } else {
+                const canvas = document.createElement('canvas');
+                QRCode.toCanvas(canvas, text, { width: 150 });
+                div.appendChild(canvas);
+                barcodeImages.push(canvas);
+            }
+
+            div.innerHTML += `<div>${escapeHtml(text)}</div>`;
+            barcodeOutput.appendChild(div);
+        });
+    }
+
+    async function downloadAllBarcodes() {
+        if (!barcodeImages.length) return;
+        const zip = new JSZip();
+
+        barcodeImages.forEach((img, i) => {
+            let dataUrl = img.toDataURL
+                ? img.toDataURL()
+                : 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(img));
+
+            zip.file(`code_${i + 1}.png`, dataUrl.split(',')[1], { base64: true });
+        });
+
+        const blob = await zip.generateAsync({ type: 'blob' });
+        saveAs(blob, 'barcodes.zip');
     }
 });
